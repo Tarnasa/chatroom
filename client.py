@@ -15,7 +15,6 @@ import signal
 
 bad_port = True
 bad_user_name = True
-read_hold = True
 
 # Setting up connection
 while(bad_port):
@@ -67,7 +66,6 @@ def startClient():
 def clientShutdown():
     sock.settimeout(0)
     sock.close()
-    read_hold = False
     # closeThreads()
     sys.exit('\nYou have left the chatroom.\n')
 
@@ -76,15 +74,16 @@ def serverShutdown():
     time.sleep(10)
     sock.settimeout(0)
     sock.close()
-    read_hold = False
     # closeThreads()
     sys.exit('\nThe server has shutdown\n')
 
 # Message Send Function
 def readMessage():
+    read_hold = True
     while read_hold:
         recvMessage = sock.recv(4096)
         if recvMessage == '/shutdown':
+            read_hold = False
             shutdownThread = threading.Thread(target=serverShutdown)
             shutdownThread.start()
         else:
@@ -94,8 +93,3 @@ def readMessage():
 readingThread = threading.Thread(target=readMessage)
 readingThread.start()
 startClient()
-
-
-
-
-
