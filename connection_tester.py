@@ -1,12 +1,17 @@
 import socket
 import threading
 
+<<<<<<< HEAD
 custom_port = input("port: ") #ports from 49152-65535 can be used for custom purposes
+=======
+custom_port = 49153 #ports from 49152-65535 can be used for custom purposes
+>>>>>>> 9b700594e98fe82269900704525db731d8578a38
 bad_port = True
 chatroom = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-hostname = socket.gethostbyaddr(socket.gethostname())[0]
+hostname = raw_input('what is the host? ')
 
 chatroom.connect((hostname, custom_port))
+<<<<<<< HEAD
 
 def listen_for_messages(connection):
 	while(True):
@@ -23,4 +28,7 @@ while True:
 	chatroom.send(msg)
 
 
+=======
+chatroom.send("hello, luke")
+>>>>>>> 9b700594e98fe82269900704525db731d8578a38
 
