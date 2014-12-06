@@ -38,13 +38,10 @@ while(bad_port):
 while(bad_user_name):
     userName = raw_input('What do you want your name to be? ex. Fred ')
     sock.sendall(userName)
-    print 'Server said that ' + userName + ' is already in use. Try another one.\n'
     if sock.recv(4096) == 'True':
         bad_user_name = False
-
-# Send Thread Start
-readingThread = threading.Thread(target=readMessage)
-readingThread.start()
+    else:
+        print 'Server said that ' + userName + ' is already in use. Try another one.\n'
 
 def startClient():
     while send_hold:
@@ -58,7 +55,6 @@ def startClient():
                 sock.sendall(message)
         except KeyboardInterrupt:
             print('Sorry, but to shut down please type one of these and press enter: /exit, /quit, or /part instead.\n')
-
 
 # Gracefully closes the threads
 def closeThreads():
@@ -91,6 +87,14 @@ def readMessage():
             shutdownThread = threading.Thread(target=serverShutdown)
             shutdownThread.start()
         print(recv)
+
+
+# Start Everything
+startClient()
+readingThread = threading.Thread(target=readMessage)
+readingThread.start()
+
+
 
 
 
