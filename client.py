@@ -36,9 +36,11 @@ while(bad_port):
 # Setting up user name
 while(bad_user_name):
     userName = raw_input('What do you want your name to be? ex. Fred ')
-    sock.sendall(userName)
+    sock.send(userName)
+    print 'here!'
     if sock.recv(4096) == 'True':
         bad_user_name = False
+        print 'Welcome ' + userName + '\n'
     else:
         print 'Server said that ' + userName + ' is already in use. Try another one.\n'
 
@@ -47,7 +49,7 @@ def startClient():
     while send_hold:
         try:
             # Message Sending
-            message = raw_input('input ')
+            message = raw_input()
             if message == '/exit' or message == '/quit' or message == '/part':
                 sock.sendall(message)#server handels any of these messages
                 clientShutdown()
@@ -85,7 +87,8 @@ def readMessage():
         if recvMessage == '/shutdown':
             shutdownThread = threading.Thread(target=serverShutdown)
             shutdownThread.start()
-        print(recv)
+        else:
+            print recvMessage
 
 
 readingThread = threading.Thread(target=readMessage)
