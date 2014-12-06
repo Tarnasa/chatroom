@@ -10,9 +10,13 @@
 import sys
 import socket
 import threading
+import time# for time.sleep()
+import signal
 
-bad_port = True
-bad_user_name = True
+global bad_port = True
+global bad_user_name = True
+global send_hold = True
+global read_hold = True
 
 # Setting up connection
 while(bad_port)
@@ -35,6 +39,58 @@ while(bad_user_name):
         userName = raw_input('What do you want your name to be? ex. Fred ')
         sock.sendall(userName)
         print 'Server said that ' + userName + ' is already in use. Try another one.\n'
-    if sock.recv(1) is True:
-        bad_user_name = False
+    if sock.recv(4096) == 'True':
+        bad_user_name == 'False'
+
+# Send Thread Start
+readingThread = threading.Thread(target=readMessage)
+readingThread.start()
+
+def startClient():
+    while send_hold:
+        try:
+            # Message Sending
+            message = raw_input('input ')
+            if message == '/exit' or message == '/quit' or message == '/part':
+                sock.sendall(message)#server handels any of these messages
+                clientShutdown()
+            else:
+                sock.sendall(message)
+        except KeyboardInterrupt:
+            print('Sorry, but to shut down please type one of these and press enter: /exit, /quit, or /part instead.\n')
+
+
+# Gracefully closes the threads
+def closeThreads():
+    for t in threading.enumerate():
+        t.join()
+
+def clientShutdown():
+    sock.settimeout(0)
+    sock.close()
+    send_hold = False
+    read_hold = False
+    closeThreads()
+    print('Client-initiated shutdown complete\n')
+
+def serverShutdown():
+    print('Connection will close in 10 seconds...\n')
+    time.sleep(10)
+    sock.settimeout(0)
+    sock.close()
+    send_hold = False
+    read_hold = False
+    closeThreads()
+    print('Server-initiated shutdown complete\n')
+
+# Message Send Function
+def readMessage():
+    while read_hold:
+        recvMessage = sock.recv(4096)
+        if recvMessage = '/shutdown'
+            shutdownThread = threading.Thread(target=serverShutdown)
+            shutdownThread.start()
+        print(recv)
+
+
 
