@@ -15,7 +15,6 @@ import signal
 
 bad_port = True
 bad_user_name = True
-send_hold = True
 read_hold = True
 
 # Setting up connection
@@ -44,14 +43,15 @@ while(bad_user_name):
         print 'Server said that ' + userName + ' is already in use. Try another one.\n'
 
 def startClient():
+    send_hold = True
     while send_hold:
         try:
             # Message Sending
             message = raw_input('input ')
             if message == '/exit' or message == '/quit' or message == '/part':
                 sock.sendall(message)#server handels any of these messages
-                send_hold = False
                 clientShutdown()
+                send_hold = False
             else:
                 sock.sendall(message)
         except KeyboardInterrupt:
@@ -65,17 +65,15 @@ def startClient():
 def clientShutdown():
     sock.settimeout(0)
     sock.close()
-    send_hold = False
     read_hold = False
     # closeThreads()
-    print('\nYou have left the chatroom.\n')
+    sys.exit('\nYou have left the chatroom.\n')
 
 def serverShutdown():
     print('\nConnection will close in 10 seconds...\n')
     time.sleep(10)
     sock.settimeout(0)
     sock.close()
-    send_hold = False
     read_hold = False
     # closeThreads()
     print('\nThe server has shutdown\n')
