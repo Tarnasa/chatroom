@@ -36,7 +36,6 @@ while(bad_port):
 while(bad_user_name):
     userName = raw_input('What do you want your name to be? ex. Fred ')
     sock.send(userName)
-    print 'here!'
     if sock.recv(4096) == 'True':
         bad_user_name = False
         print 'Welcome ' + userName + '\n'
@@ -86,6 +85,8 @@ def readMessage():
             read_hold = False
             shutdownThread = threading.Thread(target=serverShutdown)
             shutdownThread.start()
+        if recvMessage == '/bye':
+            read_hold = False
         else:
             print recvMessage
 
