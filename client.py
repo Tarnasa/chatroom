@@ -25,7 +25,7 @@ while(bad_port):
         portNumber = raw_input('What port? ')
         sock = socket.create_connection((str(serverName), int(portNumber)))
     except socket.error , msg:
-        print 'Binding failed. Error code: ' + str(msg[0]) + 'Error message: ' + msg[1]
+        print 'Binding failed. Error code: ' + str(msg[0]) + ' Error message: ' + msg[1]
     else:
         bad_port = False
         print 'You successfully connected to ' + serverName + ' on port ' + portNumber + '\n'
@@ -38,10 +38,10 @@ while(bad_port):
 while(bad_user_name):
     userName = raw_input('What do you want your name to be? ex. Fred ')
     sock.sendall(userName)
-    if sock.recv(4096) == 'False':
-        print 'Server said that ' + userName + ' is already in use. Try another one.\n'
-    else:
+    if sock.recv(4096) == 'True':
         bad_user_name = False
+    else:
+        print 'Server said that ' + userName + ' is already in use. Try another one.\n'
 
 def startClient():
     while send_hold:
@@ -57,16 +57,16 @@ def startClient():
             print('\n\n### Sorry, but to shut down please type one of these and press enter: /exit, /quit, or /part instead.\n')
 
 # Gracefully closes the threads
-def closeThreads():
-    for t in threading.enumerate():
-        t.join()
+# def closeThreads():
+#     for t in threading.enumerate():
+#         t.join()
 
 def clientShutdown():
     sock.settimeout(0)
     sock.close()
     send_hold = False
     read_hold = False
-    closeThreads()
+    # closeThreads()
     print('Client-initiated shutdown complete\n')
 
 def serverShutdown():
@@ -76,7 +76,7 @@ def serverShutdown():
     sock.close()
     send_hold = False
     read_hold = False
-    closeThreads()
+    # closeThreads()
     print('Server-initiated shutdown complete\n')
 
 # Message Send Function
