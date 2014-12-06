@@ -13,13 +13,13 @@ import threading
 import time# for time.sleep()
 import signal
 
-global bad_port = True
-global bad_user_name = True
-global send_hold = True
-global read_hold = True
+bad_port = True
+bad_user_name = True
+send_hold = True
+read_hold = True
 
 # Setting up connection
-while(bad_port)
+while(bad_port):
     try:
         serverName = raw_input('What server do you want to connect to? ex. rc02xcs213.managed.mst.edu ')
         portNumber = raw_input('What port? ')
@@ -36,9 +36,9 @@ while(bad_port)
 
 # Setting up user name
 while(bad_user_name):
-        userName = raw_input('What do you want your name to be? ex. Fred ')
-        sock.sendall(userName)
-        print 'Server said that ' + userName + ' is already in use. Try another one.\n'
+    userName = raw_input('What do you want your name to be? ex. Fred ')
+    sock.sendall(userName)
+    print 'Server said that ' + userName + ' is already in use. Try another one.\n'
     if sock.recv(4096) == 'True':
         bad_user_name == 'False'
 
@@ -87,7 +87,7 @@ def serverShutdown():
 def readMessage():
     while read_hold:
         recvMessage = sock.recv(4096)
-        if recvMessage = '/shutdown'
+        if recvMessage == '/shutdown':
             shutdownThread = threading.Thread(target=serverShutdown)
             shutdownThread.start()
         print(recv)
