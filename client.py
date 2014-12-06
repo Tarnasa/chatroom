@@ -40,7 +40,7 @@ while(bad_user_name):
     sock.sendall(userName)
     print 'Server said that ' + userName + ' is already in use. Try another one.\n'
     if sock.recv(4096) == 'True':
-        bad_user_name == 'False'
+        bad_user_name = False
 
 # Send Thread Start
 readingThread = threading.Thread(target=readMessage)
