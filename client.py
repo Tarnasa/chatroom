@@ -51,11 +51,11 @@ def startClient():
             # Message Sending
             message = raw_input()
             if message == '/exit' or message == '/quit' or message == '/part':
-                sock.sendall(message)#server handels any of these messages
+                sock.send(message)#server handels any of these messages
                 clientShutdown()
                 send_hold = False
             else:
-                sock.sendall(message)
+                sock.send(message)
         except KeyboardInterrupt:
             print('\n\n### Sorry, but to shut down please type one of these and press enter: /exit, /quit, or /part instead.\n')
 
