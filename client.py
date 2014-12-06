@@ -50,6 +50,7 @@ def startClient():
             message = raw_input('input ')
             if message == '/exit' or message == '/quit' or message == '/part':
                 sock.sendall(message)#server handels any of these messages
+                send_hold = False
                 clientShutdown()
             else:
                 sock.sendall(message)
@@ -67,17 +68,17 @@ def clientShutdown():
     send_hold = False
     read_hold = False
     # closeThreads()
-    print('Client-initiated shutdown complete\n')
+    print('\nYou have left the chatroom.\n')
 
 def serverShutdown():
-    print('Connection will close in 10 seconds...\n')
+    print('\nConnection will close in 10 seconds...\n')
     time.sleep(10)
     sock.settimeout(0)
     sock.close()
     send_hold = False
     read_hold = False
     # closeThreads()
-    print('Server-initiated shutdown complete\n')
+    print('\nThe server has shutdown\n')
 
 # Message Send Function
 def readMessage():
