@@ -63,7 +63,7 @@ def startClient():
 #         t.join()
 
 def clientShutdown():
-    sock.settimeout(0)
+    sock.settimeout(0)# Stops recv() from waiting for more messages
     sock.close()
     # closeThreads()
     sys.exit('\nYou have left the chatroom.\n')
@@ -71,9 +71,10 @@ def clientShutdown():
 def serverShutdown():
     print('\nConnection will close in 10 seconds...\n')
     time.sleep(10)
-    sock.settimeout(0)
-    sock.close()
+    # sock.settimeout(0)# Stops recv() from waiting for more messages
+    # sock.send('/bye')# for server to remove client's connection
     # closeThreads()
+    print 'theend'
     sys.exit('\nThe server has shutdown\n')
 
 # Message Send Function
@@ -85,7 +86,7 @@ def readMessage():
             read_hold = False
             shutdownThread = threading.Thread(target=serverShutdown)
             shutdownThread.start()
-        if recvMessage == '/bye':
+        if recvMessage == '/bye':# To stop recv from trying to keep recieving nothing
             read_hold = False
         else:
             print recvMessage
