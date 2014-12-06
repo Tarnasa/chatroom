@@ -76,7 +76,7 @@ def serverShutdown():
     sock.close()
     read_hold = False
     # closeThreads()
-    print('\nThe server has shutdown\n')
+    sys.exit('\nThe server has shutdown\n')
 
 # Message Send Function
 def readMessage():
@@ -88,9 +88,9 @@ def readMessage():
         print(recv)
 
 
-startClient()
 readingThread = threading.Thread(target=readMessage)
 readingThread.start()
+startClient()
 
 
 
