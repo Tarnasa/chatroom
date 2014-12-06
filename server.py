@@ -33,19 +33,20 @@ def start_server():
 					if chosen_user_name not in user_names_set:
 						user_name_exists = False
 						user_names_set.add(chosen_user_name)#add the unique name to the list
-						conn.send("True") #The user name is okay; communicate this to the client
-						
+						conn.sendall("True") #The user name is okay; communicate this to the client
 						client = {}
 						client['user_name'] = chosen_user_name
 						client['connection'] = conn
 						mutex.acquire()
+						for client in clients:
+							client['connection'].sendall(chosen_user_name + " has joined the chatroom.\n")
 						clients.append(client)
 						mutex.release()
 						msg_thread = threading.Thread(target=listen_for_msgs, args=(client,))
 						msg_thread.start()
 					else:
-						conn.send("False")
-						print "User name already taken"
+						conn.sendall("False")
+						print chosen_user_name, "already taken."
 			else:
 				print "Too many clients are attempting to connect"
 	except KeyboardInterrupt:
@@ -60,6 +61,7 @@ def listen_for_msgs(connection):
 		if msg == '/exit' or msg == "/quit" or msg == "/part":
 			clients.remove(connection)
 			connection['connection'].close()
+			user_names_set.remove(connection['user_name'])
 			user_has_left = True
 		
 		if (user_has_left == False):
@@ -76,7 +78,6 @@ def listen_for_msgs(connection):
 def kill_connections():
 	mutex.acquire()
 	for client in clients:
-		client['connection'].setblocking(0)
 		client['connection'].close()
 	mutex.release()
 
