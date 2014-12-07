@@ -19,13 +19,19 @@ server_disconnected = [] #lists are thread safe in python
 while(bad_port):
     try:
         serverName = raw_input('What server do you want to connect to? ex. rc02xcs213.managed.mst.edu ')
-        portNumber = raw_input('What port? ')
-        sock = socket.create_connection((str(serverName), int(portNumber)))
+        
+        try:
+            portNumber = input('What port? ')
+        except NameError:
+            print "Port must be a number."
+            portNumber = -1
+
+        sock = socket.create_connection((str(serverName), portNumber))
     except socket.error , msg:
         print 'Binding failed. Error code: ' + str(msg[0]) + ' Error message: ' + msg[1]
     else:
         bad_port = False
-        print 'You successfully connected to ' + serverName + ' on port ' + portNumber + '\n'
+        print 'You successfully connected to ' + serverName + ' on port ' + str(portNumber) + '\n'
 
 # First server response is True (<= 10 users connected) or False (> 10 users connected, show error msg)
 # if sock.recv(1) is False:
@@ -45,11 +51,12 @@ def startClient():
     while send_hold:
         try:
             # Message Sending
-            message = raw_input()
+            message = raw_input("You: ")
             if message == '/exit' or message == '/quit' or message == '/part':
                 sock.sendall(message)#server handels any of these messages
-                clientShutdown()
                 send_hold = False
+            if message == '/connection_closed':
+                sock.sendall('/connection_closed/') #replace this so the user doesn't accidentally send an admin command
             elif len(server_disconnected) == 0:
                 sock.sendall(message)
             elif len(server_disconnected) == 1:
@@ -65,7 +72,6 @@ def startClient():
 #         t.join()
 
 def clientShutdown():
-    sock.settimeout(0)# Stops recv() from waiting for more messages
     sock.close()
     sys.exit('\nYou have left the chatroom.\n')
 
@@ -81,12 +87,16 @@ def readMessage():
     read_hold = True
     while read_hold and len(server_disconnected) == 0:
         recvMessage = sock.recv(4096)
+        
         if recvMessage == '/shutdown':
             close_socket_wait = threading.Timer(10, close_connection)
             print("Server disconnecting. Connection will close after 10 seconds... ")
             close_socket_wait.start()
-        elif recvMessage == '/bye':
+        
+        #the server has received the shutdown request, and removed the client from its list of open clients
+        elif recvMessage == '/bye': 
             read_hold = False
+            sock.close()
         else:
             print recvMessage
 
