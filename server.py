@@ -35,7 +35,7 @@ def start_server():
 						user_name_exists = False
 						user_names_set.add(chosen_user_name)#add the unique name to the list
 						
-						conn.send("True") #The user name is okay; communicate this to the client
+						conn.sendall("True") #The user name is okay; communicate this to the client
 						client = {}
 						client['user_name'] = chosen_user_name
 						client['connection'] = conn
@@ -44,13 +44,13 @@ def start_server():
 						clients.append(client)
 						for client in clients:
 							if client['user_name'] != chosen_user_name:
-								client['connection'].send(chosen_user_name + " has joined the chatroom.\n")
+								client['connection'].sendall(chosen_user_name + " has joined the chatroom.\n")
 						mutex.release()
 						
 						msg_thread = threading.Thread(target=listen_for_msgs, args=(client,chatroom))
 						msg_thread.start()
 					else:
-						conn.send("False")
+						conn.sendall("False")
 						print chosen_user_name, "already taken."
 			else:
 				print "Too many clients are attempting to connect"
@@ -69,8 +69,10 @@ def listen_for_msgs(connection, chatroom):
 		if len(msg) == 0:
 			clients.remove(connection)
 			user_names_set.remove(connection['user_name'])
+			
 			if len(clients) == 0:
 				chatroom.close()
+			
 			server_closing = True
 			print "Chatroom closed."
 
@@ -79,7 +81,7 @@ def listen_for_msgs(connection, chatroom):
 			clients.remove(connection)
 			mutex.release()
 
-			connection['connection'].send("/bye")
+			connection['connection'].sendall("/bye")
 			connection['connection'].close()
 			user_names_set.remove(connection['user_name'])
 			user_has_left = True
@@ -93,13 +95,13 @@ def listen_for_msgs(connection, chatroom):
 			mutex.acquire()
 			for client in clients:
 				if client['user_name'] != connection['user_name']:
-					client['connection'].send(msg)
+					client['connection'].sendall(msg)
 			mutex.release()
 
 
 def warn_and_close(connection):
 	for client in clients:
-		client['connection'].send("/shutdown")
+		client['connection'].sendall("/shutdown")
 
 start_server()
 
