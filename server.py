@@ -76,7 +76,6 @@ def listen_for_msgs(connection, chatroom):
 	while(user_has_left == False and server_closing == False):
 		try:
 			msg = connection['connection'].recv(4096)
-			print "message from", connection['user_name'], msg
 
 			if msg == '/connection_closed': #A client will send /connection_closed to acknowledge the server shutdown.s
 				mutex.acquire()
