@@ -1,5 +1,6 @@
 import socket
 import threading
+import sys
 
 mutex = threading.Lock()
 
@@ -60,44 +61,45 @@ def start_server():
 
 def listen_for_msgs(connection, chatroom):
 	user_has_left = False
-	while(user_has_left == False):
+	server_closing = False
+
+	while(user_has_left == False and server_closing == False):
 		msg = connection['connection'].recv(4096)
-		
-		if msg == '/exit' or msg == "/quit" or msg == "/part":
+
+		if len(msg) == 0:
 			clients.remove(connection)
+			user_names_set.remove(connection['user_name'])
+			if len(clients) == 0:
+				chatroom.close()
+			server_closing = True
+			print "Chatroom closed."
+
+		if msg == '/exit' or msg == "/quit" or msg == "/part":
+			mutex.acquire()
+			clients.remove(connection)
+			mutex.release()
+
 			connection['connection'].send("/bye")
 			connection['connection'].close()
 			user_names_set.remove(connection['user_name'])
 			user_has_left = True
 
-		if msg == '/bye': 
-			clients.remove(connection)
-			connection['connection'].close()
-			user_names.set.remove(connection['user_name'])
-			user_has_left = True
-
-			if len(clients) == 0:
-				chatroom.close()
-				sys.exit("The server has shut down.")
-		
 		if (user_has_left == False):
 			msg = connection['user_name'] + ": " + msg
-		elif msg != '/bye':
+		elif (user_has_left == True):
 			msg = connection['user_name'] + " has left the chatroom."
-		elif msg == '/bye':
-			print "Server will shut down"
 
-		if msg != '/bye':
+		if (server_closing != True):
 			mutex.acquire()
 			for client in clients:
 				if client['user_name'] != connection['user_name']:
 					client['connection'].send(msg)
 			mutex.release()
 
+
 def warn_and_close(connection):
 	for client in clients:
 		client['connection'].send("/shutdown")
-
 
 start_server()
 

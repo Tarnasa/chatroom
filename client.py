@@ -70,11 +70,9 @@ def clientShutdown():
 
 def serverShutdown():
     print('\nConnection will close in 10 seconds...\n')
-    time.sleep(10)
-    sock.settimeout(0)
+    time.sleep(0.5)
     sock.close()
-    # closeThreads()
-    sys.exit('\nThe server has shutdown\n')
+    #closeThreads()
 
 # Message Send Function
 def readMessage():
@@ -85,10 +83,14 @@ def readMessage():
             read_hold = False
             shutdownThread = threading.Thread(target=serverShutdown)
             shutdownThread.start()
-        if recvMessage == '/bye':
+        elif recvMessage == '/bye':
             read_hold = False
         else:
             print recvMessage
+        
+        if len(recvMessage) == 0:
+            read_hold = False
+
 
 
 readingThread = threading.Thread(target=readMessage)
