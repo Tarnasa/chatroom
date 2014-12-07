@@ -16,7 +16,7 @@ def start_server():
 		chatroom = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #create a socket with the address family AF_INET and socket type SOCK_STREAM
 		
 		hostname = socket.gethostbyaddr(socket.gethostname())[0] #The current machine becomes the server
-		print hostname
+		hostname = "lbs5g8@" + hostname
 
 		while(bad_port and custom_port < 65536): #Bind the socket to a port number that is not already taken
 			try: #try binding with the given port number
