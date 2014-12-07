@@ -70,18 +70,19 @@ def clientShutdown():
     sys.exit('\nYou have left the chatroom.\n')
 
 def close_connection():
+    sock.sendall('/connection_closed')
     sock.close()
-    print("Server now disconnected. Press any key to exit the program.")
     server_disconnected.append(True)
+    print("Server now disconnected. Press any key to exit the program.")
+    
 
 # Message Send Function
 def readMessage():
     read_hold = True
-    while read_hold:
+    while read_hold and len(server_disconnected) == 0:
         recvMessage = sock.recv(4096)
         if recvMessage == '/shutdown':
-            read_hold = False
-            close_socket_wait = threading.Timer(1, close_connection)
+            close_socket_wait = threading.Timer(10, close_connection)
             print("Server disconnecting. Connection will close after 10 seconds... ")
             close_socket_wait.start()
         elif recvMessage == '/bye':

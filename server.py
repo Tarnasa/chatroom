@@ -66,24 +66,26 @@ def listen_for_msgs(connection, chatroom):
 	while(user_has_left == False and server_closing == False):
 		msg = connection['connection'].recv(4096)
 
-		if len(msg) == 0:
+		if msg == '/connection_closed':
+			mutex.acquire()
 			clients.remove(connection)
 			user_names_set.remove(connection['user_name'])
+			mutex.release()
 			
 			if len(clients) == 0:
 				chatroom.close()
-			
-			server_closing = True
-			print "Chatroom closed."
+				server_closing = True
+				sys.exit("Chatroom closed.")
 
 		if msg == '/exit' or msg == "/quit" or msg == "/part":
 			mutex.acquire()
 			clients.remove(connection)
+			user_names_set.remove(connection['user_name'])
 			mutex.release()
 
 			connection['connection'].sendall("/bye")
 			connection['connection'].close()
-			user_names_set.remove(connection['user_name'])
+			
 			user_has_left = True
 
 		if (user_has_left == False):
