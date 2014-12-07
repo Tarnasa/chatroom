@@ -43,7 +43,8 @@ def get_user_name(conn):
         if "True" in valid_name:
             bad_user_name = False
             total_users = valid_name.split(',')[1]
-            print 'Welcome' , userName + "!", "There are currently", total_users, "other users logged on.\n" 
+            print 'Welcome' , userName + "!", "There are currently", total_users, "other users logged on.\n"
+            print "To send a message, simply type your message and hit enter."
         elif "False" in valid_name:
             print 'Server said that ' + userName + ' is already in use. Try another one.\n'
         elif "/too_many" in valid_name:
@@ -54,7 +55,7 @@ def startClient(conn):
     while send_hold:
         try:
             # Message Sending
-            message = raw_input("You: ")
+            message = raw_input()
             if message == '/exit' or message == '/quit' or message == '/part':
                 send_hold = False
             if message == '/connection_closed':

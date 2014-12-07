@@ -1,5 +1,6 @@
 import socket
 import threading
+import thread
 import sys
 import errno
 
@@ -14,7 +15,8 @@ def start_server():
 		bad_port = True
 		chatroom = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #create a socket with the address family AF_INET and socket type SOCK_STREAM
 		
-		hostname = socket.gethostbyname(socket.gethostname()) #The current machine becomes the server
+		hostname = socket.gethostbyaddr(socket.gethostname())[0] #The current machine becomes the server
+		print hostname
 
 		while(bad_port and custom_port < 65536): #Bind the socket to a port number that is not already taken
 			try: #try binding with the given port number
@@ -28,10 +30,19 @@ def start_server():
 		if custom_port == 65536:
 			sys.exit("Error: Unable to find a port that is not already taken. Something has gone wrong...")
 
-		chatroom.listen(4) #begin listening for incoming requests.
+		try:
+			chatroom.listen(4) #begin listening for incoming requests.
+		except socket.error as e:
+			print e
+			sys.exit("Chatroom unable to listen for connections. Ending program.")
 
 		while True: #Always accept new connections
-			conn, address = chatroom.accept() #conn is the socket, address is a tuple of (host, port)
+			try:
+				conn, address = chatroom.accept() #conn is the socket, address is a tuple of (host, port)
+			except socket.error as e:
+				print e
+				sys.exit("Unable to accept connection. Ending program")
+
 			if len(clients) < 10:
 				user_name_exists = True
 				while(user_name_exists):
@@ -41,6 +52,7 @@ def start_server():
 						if e.errno == errno.ECONNRESET:
 							print "Client quit before entering a user name"
 							break
+					
 					if chosen_user_name not in user_names_set:
 						user_name_exists = False
 						
@@ -48,6 +60,8 @@ def start_server():
 						client = {}
 						client['user_name'] = chosen_user_name
 						client['connection'] = conn
+						
+						print chosen_user_name + " has joined the chatroom."
 						
 						mutex.acquire()
 						clients.append(client)
@@ -57,8 +71,13 @@ def start_server():
 						user_names_set.add(chosen_user_name)#add the unique name to the list
 						mutex.release()
 						
-						msg_thread = threading.Thread(target=listen_for_msgs, args=(client,chatroom))
-						msg_thread.start() #Begin a new thread that listens for messages from this client
+						try:
+							msg_thread = threading.Thread(target=listen_for_msgs, args=(client,chatroom))
+							msg_thread.start() #Begin a new thread that listens for messages from this client
+						except thread.error as e:
+							print e
+							sys.exit("Unable to start listening thread. Ending program.")
+
 					else:
 						conn.send("False") #Communicate to the client that the name is taken
 						print chosen_user_name, "already taken."
@@ -91,7 +110,6 @@ def listen_for_msgs(connection, chatroom):
 				server_closing = True
 
 			if msg == '/exit' or msg == "/quit" or msg == "/part":
-				connection['connection'].send("/bye") 
 				mutex.acquire()
 				clients.remove(connection)
 				user_names_set.remove(connection['user_name'])
@@ -109,6 +127,7 @@ def listen_for_msgs(connection, chatroom):
 				msg = connection['user_name'] + " has left the chatroom."
 
 			if (server_closing == False):
+				print msg
 				mutex.acquire()
 				for client in clients:
 					if client['user_name'] != connection['user_name']:
