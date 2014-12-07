@@ -65,7 +65,7 @@ def startClient():
 #         t.join()
 
 def clientShutdown():
-    sock.settimeout(0)
+    sock.settimeout(0)# Stops recv() from waiting for more messages
     sock.close()
     sys.exit('\nYou have left the chatroom.\n')
 
