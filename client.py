@@ -56,7 +56,6 @@ def startClient(conn):
             # Message Sending
             message = raw_input("You: ")
             if message == '/exit' or message == '/quit' or message == '/part':
-                conn.send(message)#server handles any of these messages
                 send_hold = False
             if message == '/connection_closed':
                 conn.send('/connection_closed/') #replace this so the user doesn't accidentally send an admin command

@@ -76,6 +76,7 @@ def listen_for_msgs(connection, chatroom):
 	while(user_has_left == False and server_closing == False):
 		try:
 			msg = connection['connection'].recv(4096)
+			print "message from", connection['user_name'], msg
 
 			if msg == '/connection_closed': #A client will send /connection_closed to acknowledge the server shutdown.s
 				mutex.acquire()
@@ -91,12 +92,13 @@ def listen_for_msgs(connection, chatroom):
 				server_closing = True
 
 			if msg == '/exit' or msg == "/quit" or msg == "/part":
+				connection['connection'].send("/bye") 
 				mutex.acquire()
 				clients.remove(connection)
 				user_names_set.remove(connection['user_name'])
 				mutex.release()
 
-				connection['connection'].send("/bye") #Tell the client that it is no longer listening to it
+				connection['connection'].send("/bye") #Tell the client that it is no longer listening to it. The client will disconnect itself
 				user_has_left = True
 			
 			if msg == '/connection_closed/': #used so the user doesn't inadvertantly send an admin command
@@ -113,6 +115,7 @@ def listen_for_msgs(connection, chatroom):
 					if client['user_name'] != connection['user_name']:
 						client['connection'].send(msg)
 				mutex.release()
+
 		except socket.error as e:
 			if e.errno == errno.ECONNRESET:
 				print e
