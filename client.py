@@ -3,13 +3,13 @@
   Coded by: Luke Simon and Joshua Wyss
   Class: CS 3800
   Professors: Dr. Ercal and Dr. Chellappan
+  File Description: The client side of the chatroom
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * '''
 import sys
 import socket
 import threading
-import thread
-import time# for time.sleep()
+
 
 server_disconnected = [] #lists are thread safe in python
 
@@ -65,7 +65,7 @@ def startClient(conn):
             elif len(server_disconnected) == 1:
                 sys.exit("Goodbye.")
         except KeyboardInterrupt:
-            print('\n\n### Sorry, but to shut down please type one of these and press enter: /exit, /quit, or /part instead.\n')
+            print('\n\n### Sorry, but to shut down please type one of these and press enter: /exit, /quit, or /part\n')
         except socket.error, e:
             print "WINNING"
 
