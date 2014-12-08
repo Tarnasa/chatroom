@@ -1,3 +1,11 @@
+''' * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+  Coded by: Luke Simon and Joshua Wyss
+  Class: CS 3800
+  Professors: Dr. Ercal and Dr. Chellappan
+  File Description: Server side of the chatroom
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * '''
 import socket
 import threading
 import thread
@@ -15,7 +23,7 @@ def start_server():
 		bad_port = True
 		chatroom = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #create a socket with the address family AF_INET and socket type SOCK_STREAM
 		
-		hostname = socket.gethostbyname(socket.gethostname()) #The current machine becomes the server
+		hostname = socket.gethostbyaddr(socket.gethostname())[0] #The current machine becomes the server
 
 		while(bad_port and custom_port < 65536): #Bind the socket to a port number that is not already taken
 			try: #try binding with the given port number
@@ -94,7 +102,7 @@ def listen_for_msgs(connection, chatroom):
 	while(user_has_left == False and server_closing == False):
 		try:
 			msg = connection['connection'].recv(4096)
-
+			print msg
 			if msg == '/connection_closed': #A client will send /connection_closed to acknowledge the server shutdown.s
 				mutex.acquire()
 				clients.remove(connection)
@@ -113,7 +121,6 @@ def listen_for_msgs(connection, chatroom):
 				clients.remove(connection)
 				user_names_set.remove(connection['user_name'])
 				mutex.release()
-
 				connection['connection'].send("/bye") #Tell the client that it is no longer listening to it. The client will disconnect itself
 				user_has_left = True
 			
@@ -163,17 +170,3 @@ def warn_and_close(connection):
 			client['connection'].send("/shutdown")
 
 start_server()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
